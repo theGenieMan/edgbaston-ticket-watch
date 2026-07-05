@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
 import re
 
-from config import URL, EVENT_NAME
+from config import URL, EVENT_NAME, TICKET_PATTERN
 
 
 def get_ticket_count():
@@ -36,7 +36,7 @@ def get_ticket_count():
     if len(headings) >= 2:
         section = section[:headings[1].start()]
 
-    match = re.search(r"(\d+)\s+tickets", section)
+    match = re.search(TICKET_PATTERN, section)
 
     if not match:
         raise RuntimeError("Ticket count not found")
