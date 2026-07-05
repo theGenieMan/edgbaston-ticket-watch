@@ -25,6 +25,6 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium
 
-      - name: Test parser
+      - name: Test logger
         run: |
-          python src/test_parser.py
+          python src/test_logger.py
