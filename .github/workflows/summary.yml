@@ -2,7 +2,8 @@ name: Ticket Summary Report
 
 on:
   schedule:
-    - cron: "0 */2 * * *"  # every 2 hours
+    # Every 2 hours
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 jobs:
@@ -11,7 +12,7 @@ jobs:
 
     steps:
 
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -25,15 +26,26 @@ jobs:
           pip install -r requirements.txt
 
       - name: Restore cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
-          path: logs/
-          key: edgbaston-watch-cache-
-          restore-keys: edgbaston-watch-cache-
+          path: |
+            state/
+            logs/
+          key: edgbaston-watch-cache-${{ github.run_id }}
+          restore-keys: |
+            edgbaston-watch-cache-
 
       - name: Send summary
-  env:
-    TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-  run: |
-    python src/test_summary.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python src/test_summary.py
+
+      - name: Save cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            state/
+            logs/
+          key: edgbaston-watch-cache-${{ github.run_id }}
