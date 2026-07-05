@@ -1,11 +1,12 @@
 name: Edgbaston Ticket Watch
 
 on:
+  schedule:
+    - cron: "*/5 6-21 * * *"  # 07:00–22:00 UK (BST approx)
   workflow_dispatch:
 
 jobs:
-
-  parser-test:
+  monitor:
 
     runs-on: ubuntu-latest
 
@@ -14,17 +15,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install packages
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install chromium
 
-      - name: Test logger
+      # -----------------------------
+      # RESTORE CACHE (state + logs)
+      # -----------------------------
+      - name: Restore state cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            state/
+            logs/
+          key: edgbaston-watch-cache
+
+      # -----------------------------
+      # RUN MONITOR
+      # -----------------------------
+      - name: Run monitor
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python src/test_logger.py
+          python src/monitor.py
+
+      # -----------------------------
+      # SAVE CACHE
+      # -----------------------------
+      - name: Save state cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            state/
+            logs/
+          key: edgbaston-watch-cache
