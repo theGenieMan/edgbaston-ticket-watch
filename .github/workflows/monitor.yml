@@ -48,10 +48,13 @@ jobs:
         run: |
           python src/monitor.py
 
-      - name: View CSV log
-      run: |
-        echo "===== LOG FILE ====="
-        cat logs/current.csv || echo "No logs yet"
+      # -----------------------------
+      # DEBUG: SHOW CSV LOG
+      # -----------------------------
+      - name: Show CSV log
+        run: |
+          echo "===== CURRENT CSV LOG ====="
+          cat logs/current.csv || echo "No log file yet"
 
       # -----------------------------
       # SAVE CACHE
